@@ -1,0 +1,107 @@
+/* ============================================
+   Ponto azul pulsante — localização atual
+   ============================================ */
+
+.my-location-dot {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+/* Círculo azul central */
+.my-location-dot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  background: #2563eb;
+  border: 2.5px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.6);
+  z-index: 2;
+}
+
+/* Anel pulsante */
+.my-location-dot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background: rgba(59, 130, 246, 0.25);
+  border-radius: 50%;
+  z-index: 1;
+  animation: location-pulse 2s ease-out infinite;
+}
+
+@keyframes location-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
+}
+
+
+.map-marker {
+  width: 36px;
+  height: 36px;
+  border-radius: 50% 50% 50% 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+}
+
+.map-marker > * {
+  transform: rotate(45deg);
+}
+
+.map-marker-green {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.map-marker-red {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.map-marker-blue {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.map-marker-me {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.4), 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Popup customizado */
+.leaflet-popup-inner {
+  padding: 4px 2px;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.popup-success {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.popup-danger {
+  color: #ef4444;
+  font-weight: 600;
+}
