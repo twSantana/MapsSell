@@ -15,7 +15,7 @@ interface Props {
   onAddSegment?: () => void
 }
 
-const OPERADORAS = ['Claro', 'Vivo', 'Tim', 'Oi', 'Algar', 'Outra', 'Nenhuma']
+const OPERADORAS = ['LIGGA', 'NIO', 'TIM']
 
 export default function StreetPanel({ segment, initialData, onClose, onSaved, onDeleted, onAddSegment }: Props) {
   const supabase = createClient()

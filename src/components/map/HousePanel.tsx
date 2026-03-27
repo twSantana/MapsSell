@@ -15,7 +15,7 @@ interface Props {
   onDeleted?: (houseId: string) => void
 }
 
-const OPERADORAS = ['Claro', 'Vivo', 'Tim', 'Oi', 'Algar', 'Outra', 'Nenhuma']
+const OPERADORAS = ['LIGGA', 'NIO', 'TIM']
 
 export default function HousePanel({ lat, lng, initialData, onClose, onSaved, onDeleted }: Props) {
   const supabase = createClient()

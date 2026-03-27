@@ -153,7 +153,11 @@ export default function MapboxView() {
         type: 'line',
         source: 'streets-source',
         paint: {
-          'line-color': '#22c55e',
+          'line-color': [
+            'case',
+            ['==', ['get', 'operator'], 'LIGGA'], '#f97316',
+            '#22c55e'
+          ],
           'line-width': 10,
           'line-blur': 8,
           'line-opacity': 0.4
@@ -165,7 +169,11 @@ export default function MapboxView() {
         type: 'line',
         source: 'streets-source',
         paint: {
-          'line-color': '#22c55e',
+          'line-color': [
+            'case',
+            ['==', ['get', 'operator'], 'LIGGA'], '#f97316',
+            '#22c55e'
+          ],
           'line-width': 4
         }
       })
