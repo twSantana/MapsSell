@@ -279,7 +279,10 @@ export default function MapboxView() {
   // Sincronizar streets do banco pro GeoJSON source
   const updateStreetsGeoJSON = useCallback(() => {
     const map = mapRef.current
-    if (!map || !map.isStyleLoaded()) return
+    if (!map) return
+
+    const source = map.getSource('streets-source') as mapboxgl.GeoJSONSource
+    if (!source) return
 
     const features: any[] = streets
       .filter(s => s.lat_start && s.lng_start && s.lat_end && s.lng_end)
@@ -295,10 +298,7 @@ export default function MapboxView() {
         }
       })
 
-    const source = map.getSource('streets-source') as mapboxgl.GeoJSONSource
-    if (source) {
-      source.setData({ type: 'FeatureCollection', features })
-    }
+    source.setData({ type: 'FeatureCollection', features })
   }, [streets])
 
   useEffect(() => {
