@@ -23,6 +23,7 @@ export default function MapboxView() {
   // Drawing mode
   const drawingModeRef = useRef(false)
   const drawStartRef = useRef<[number, number] | null>(null)
+  const firstPinRef = useRef<mapboxgl.Marker | null>(null)
 
   // State
   const [userId, setUserId] = useState<string | undefined>()
@@ -176,62 +177,55 @@ export default function MapboxView() {
     })
 
     // Drag to Draw Events
-    map.on('mousedown', (e) => {
-      if (!drawingModeRef.current) return
-      e.preventDefault() // Cancela arrastar tela
-      drawStartRef.current = [e.lngLat.lng, e.lngLat.lat]
-      map.dragPan.disable()
-    })
-
-    map.on('mousemove', (e) => {
-      if (!drawingModeRef.current || !drawStartRef.current) return
-
-      const source = map.getSource('preview-line') as mapboxgl.GeoJSONSource
-      if (source) {
-        source.setData({
-          type: 'Feature',
-          geometry: { type: 'LineString', coordinates: [drawStartRef.current, [e.lngLat.lng, e.lngLat.lat]] },
-          properties: {}
-        })
-      }
-    })
-
-    map.on('mouseup', (e) => {
-      if (!drawingModeRef.current || !drawStartRef.current) return
-
-      const startLngLat = drawStartRef.current
-      const endLngLat = [e.lngLat.lng, e.lngLat.lat]
-      
-      map.dragPan.enable()
-      drawStartRef.current = null
-
-      const source = map.getSource('preview-line') as mapboxgl.GeoJSONSource
-      if (source) {
-        source.setData({ type: 'Feature', geometry: { type: 'LineString', coordinates: [] }, properties: {} })
-      }
-
-      // Distância muito curta
-      const distance = Math.sqrt(Math.pow(endLngLat[0]-startLngLat[0], 2) + Math.pow(endLngLat[1]-startLngLat[1], 2))
-      if (distance < 0.0001) return
-
-      setDrawnSegment({
-        start: { lat: startLngLat[1], lng: startLngLat[0] },
-        end: { lat: endLngLat[1], lng: endLngLat[0] }
-      })
-
-      setDrawingMode(false)
-
-      const pendingStreet = pendingAppendRef.current
-      if (pendingStreet) {
-        setEditingStreet(pendingStreet) // Show panel immediately with segment AND initialData
-        setPendingAppendStreet(null)
-      }
-    })
-
-    // Clique normal para Casa
+    // Clique principal do Mapa
     map.on('click', (e) => {
-      // Ignorar cliques na rua ou se estiver desenhando
-      if (drawingModeRef.current) return
+      // ESTAMOS EM MODO DE DESENHO (DRAWING MODE)
+      if (drawingModeRef.current) {
+        if (!drawStartRef.current) {
+          // Primeiro clique (Ponto A)
+          drawStartRef.current = [e.lngLat.lng, e.lngLat.lat]
+          
+          // Colocar um Marker de "A"
+          const el = document.createElement('div')
+          el.innerHTML = '<div style="background:#22c55e;width:16px;height:16px;border-radius:50%;border:4px solid #fff;box-shadow:0 0 8px rgba(0,0,0,0.5);"></div>'
+          
+          const marker = new mapboxgl.Marker({ element: el })
+            .setLngLat(e.lngLat)
+            .addTo(map)
+          
+          firstPinRef.current = marker
+        } else {
+          // Segundo clique (Ponto B)
+          const startLngLat = drawStartRef.current
+          const endLngLat = [e.lngLat.lng, e.lngLat.lat]
+
+          // Distância muito curta
+          const distance = Math.sqrt(Math.pow(endLngLat[0]-startLngLat[0], 2) + Math.pow(endLngLat[1]-startLngLat[1], 2))
+          if (distance < 0.0001) return
+
+          // Limpar Ponto A
+          if (firstPinRef.current) {
+            firstPinRef.current.remove()
+            firstPinRef.current = null
+          }
+          drawStartRef.current = null
+          
+          setDrawnSegment({
+            start: { lat: startLngLat[1], lng: startLngLat[0] },
+            end: { lat: endLngLat[1], lng: endLngLat[0] }
+          })
+          setDrawingMode(false)
+
+          const pendingStreet = pendingAppendRef.current
+          if (pendingStreet) {
+            setEditingStreet(pendingStreet) 
+            setPendingAppendStreet(null)
+          }
+        }
+        return // Importante: ignorar lógicas abaixo caso em modo de desenho
+      }
+
+      // MODO NORMAL - Ignorar clique na rua
       const features = map.queryRenderedFeatures(e.point, { layers: ['streets-layer'] })
       if (features.length > 0) return
 
@@ -376,6 +370,15 @@ export default function MapboxView() {
     if (!map) return
 
     map.getCanvas().style.cursor = drawingMode ? 'crosshair' : ''
+    
+    // Auto-destroy temporary pins when disabling drawing mode
+    if (!drawingMode) {
+      drawStartRef.current = null
+      if (firstPinRef.current) {
+        firstPinRef.current.remove()
+        firstPinRef.current = null
+      }
+    }
   }, [drawingMode])
 
   function handleHouseSaved(house: House) {
@@ -448,7 +451,7 @@ export default function MapboxView() {
 
       {drawingMode && (
         <div className={styles.drawingHint}>
-          🖊️ Clique e arraste no mapa para marcar uma rua com operadora disponível
+          📍 Toque no mapa para marcar o começo e o fim do trecho
         </div>
       )}
 
