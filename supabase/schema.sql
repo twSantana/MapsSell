@@ -38,6 +38,7 @@ create table if not exists houses (
   installation_date date,
   current_operator text,
   notes text,
+  user_id uuid references auth.users(id) default auth.uid(),
   created_at timestamp with time zone default now()
 );
 
@@ -66,8 +67,9 @@ alter table sellers_locations enable row level security;
 create policy "Leitura pública de ruas" on streets
   for select to authenticated using (true);
 
-create policy "Leitura pública de casas" on houses
-  for select to authenticated using (true);
+-- Política: o vendedor só pode ver suas próprias casas, E os clientes finalizados de outros vendedores (is_client = true)
+create policy "Visualização restrita de casas" on houses
+  for select to authenticated using (user_id = auth.uid() OR is_client = true);
 
 create policy "Leitura pública de vendedores" on sellers_locations
   for select to authenticated using (true);
@@ -76,8 +78,8 @@ create policy "Leitura pública de vendedores" on sellers_locations
 create policy "Inserir casas" on houses
   for insert to authenticated with check (true);
 
-create policy "Atualizar casas" on houses
-  for update to authenticated using (true);
+create policy "Atualizar próprias casas" on houses
+  for update to authenticated using (user_id = auth.uid());
 
 create policy "Inserir ruas" on streets
   for insert to authenticated with check (true);
@@ -93,8 +95,8 @@ create policy "Atualizar localização própria" on sellers_locations
   for update to authenticated using (auth.uid() = user_id);
 
 -- Política: qualquer usuário pode deletar casas e ruas
-create policy "Deletar casas" on houses
-  for delete to authenticated using (true);
+create policy "Deletar próprias casas" on houses
+  for delete to authenticated using (user_id = auth.uid());
 
 create policy "Deletar ruas" on streets
   for delete to authenticated using (true);

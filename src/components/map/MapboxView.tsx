@@ -346,11 +346,18 @@ export default function MapboxView() {
     // Adicionar/Atualizar casas
     houses.forEach(house => {
       let marker = houseMarkersRef.current.get(house.id)
+
+      let markerColor = 'map-marker-red';
+      if (house.is_client) {
+        if (house.current_operator === 'TIM') markerColor = 'map-marker-blue';
+        else if (house.current_operator === 'LIGGA') markerColor = 'map-marker-orange';
+        else markerColor = 'map-marker-green'; // NIO or other
+      }
       
       if (!marker) {
         const el = document.createElement('div')
         el.className = 'map-marker-container'
-        el.innerHTML = `<div class="map-marker ${house.is_client ? 'map-marker-green' : 'map-marker-red'}">🏠</div>`
+        el.innerHTML = `<div class="map-marker ${markerColor}">🏠</div>`
 
         el.addEventListener('click', (e) => {
           e.stopPropagation()
@@ -362,6 +369,11 @@ export default function MapboxView() {
           .addTo(map)
 
         houseMarkersRef.current.set(house.id, marker)
+      } else {
+        // Atualiza a cor de um marcador existente em tempo real
+        const el = marker.getElement();
+        const innerDiv = el.querySelector('.map-marker');
+        if (innerDiv) innerDiv.className = `map-marker ${markerColor}`;
       }
 
       // Controle de visibilidade

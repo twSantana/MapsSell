@@ -12,6 +12,7 @@ const navItems = [
   { href: '/', icon: '🗺️', label: 'Mapa' },
   { href: '/casas', icon: '🏠', label: 'Casas' },
   { href: '/ruas', icon: '🛣️', label: 'Ruas' },
+  { href: '/vendas', icon: '📊', label: 'Painel Vendas' },
   { href: '/vendedores', icon: '👥', label: 'Vendedores' },
 ]
 

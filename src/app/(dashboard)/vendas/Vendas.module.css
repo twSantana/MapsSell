@@ -1,0 +1,91 @@
+.container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  color: var(--color-text);
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.header h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header p {
+  color: var(--color-text-muted);
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.metricCard {
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-border);
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.metricTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metricValue {
+  font-size: 48px;
+  font-weight: 700;
+  margin: 8px 0;
+  color: var(--color-primary);
+}
+
+.metricSubtitle {
+  font-size: 13px;
+  color: var(--color-text-dim);
+}
+
+.tableSection {
+  background: var(--color-bg-2);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.tableHeader {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-border);
+  background: rgba(255,255,255,0.02);
+}
+
+.tableHeader h2 {
+  font-size: 18px;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Responsividade Mobile */
+@media (max-width: 768px) {
+  .container {
+    padding: 16px;
+    padding-bottom: 80px; /* Evita que o último card seja cortado se abrir em bottom nav */
+  }
+
+  .metricValue {
+    font-size: 36px;
+  }
+}
