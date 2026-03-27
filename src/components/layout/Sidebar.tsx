@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { logout } from '@/app/actions'
 import type { User } from '@supabase/supabase-js'
+import { useState, useEffect } from 'react'
 import { useMapTheme, MAP_THEMES, ThemeKey } from '@/contexts/ThemeContext'
 import styles from './Sidebar.module.css'
 
@@ -17,10 +18,29 @@ const navItems = [
 export default function Sidebar({ user }: { user: User }) {
   const pathname = usePathname()
   const { mapTheme, setMapTheme } = useMapTheme()
+  const [isOpen, setIsOpen] = useState(false)
+
+  // Close sidebar on path change (mobile)
+  useEffect(() => {
+    setIsOpen(false)
+  }, [pathname])
 
   return (
-    <aside className={styles.sidebar}>
-      {/* Logo */}
+    <>
+      <button 
+        className={`${styles.mobileToggle} ${isOpen ? styles.hidden : ''}`}
+        onClick={() => setIsOpen(true)}
+        title="Abrir Menu"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      {isOpen && <div className={styles.mobileOverlay} onClick={() => setIsOpen(false)} />}
+
+      <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
+        {/* Logo */}
       <div className={styles.logo}>
         <span className={styles.logoIcon}>📍</span>
         <div>
@@ -77,5 +97,6 @@ export default function Sidebar({ user }: { user: User }) {
         </form>
       </div>
     </aside>
+    </>
   )
 }

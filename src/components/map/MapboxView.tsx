@@ -94,7 +94,7 @@ export default function MapboxView() {
       showUserHeading: true,
       showAccuracyCircle: false
     })
-    map.addControl(geolocate, 'top-right')
+    map.addControl(geolocate, 'bottom-right')
 
     map.on('load', () => {
       mapRef.current = map

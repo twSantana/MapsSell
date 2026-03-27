@@ -78,3 +78,26 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Responsive Mobile Layout (Bottom Sheet) */
+@media (max-width: 768px) {
+  .overlay {
+    align-items: flex-end; /* Align to bottom */
+    justify-content: center;
+  }
+  
+  .panel {
+    max-width: 100%;
+    height: auto;
+    max-height: 85vh; /* Standard mobile bottom sheet height */
+    border-radius: 20px 20px 0 0;
+    border-left: none;
+    border-top: 1px solid #333;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
