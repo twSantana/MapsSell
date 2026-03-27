@@ -92,10 +92,19 @@ create policy "Inserir localização" on sellers_locations
 create policy "Atualizar localização própria" on sellers_locations
   for update to authenticated using (auth.uid() = user_id);
 
+-- Política: qualquer usuário pode deletar casas e ruas
+create policy "Deletar casas" on houses
+  for delete to authenticated using (true);
+
+create policy "Deletar ruas" on streets
+  for delete to authenticated using (true);
+
 -- ============================================
--- Habilitar Realtime na tabela de localizações
+-- Habilitar Realtime nas tabelas
 -- ============================================
 -- No painel do Supabase, vá em Database > Replication
--- e habilite a tabela sellers_locations para realtime.
+-- e habilite as tabelas para realtime.
 -- OU execute:
 -- alter publication supabase_realtime add table sellers_locations;
+-- alter publication supabase_realtime add table houses;
+-- alter publication supabase_realtime add table streets;

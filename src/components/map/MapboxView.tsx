@@ -58,14 +58,52 @@ export default function MapboxView() {
     })
   }, [supabase])
 
-  // Load Initial Data
+  // Load Initial Data & Subscribe to Realtime
   useEffect(() => {
+    // Busca inicial
     supabase.from('houses').select('*').then(({ data }) => {
       if (data) setHouses(data)
     })
     supabase.from('streets').select('*').eq('has_coverage', true).then(({ data }) => {
       if (data) setStreets(data as Street[])
     })
+
+    // Tempo Real (Realtime) para Casas
+    const housesChannel = supabase.channel('realtime-houses')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'houses' }, (payload) => {
+        setHouses(prev => {
+          if (payload.eventType === 'INSERT') {
+            const exists = prev.find(h => h.id === payload.new.id)
+            if (exists) return prev
+            return [...prev, payload.new as House]
+          }
+          if (payload.eventType === 'UPDATE') return prev.map(h => h.id === payload.new.id ? payload.new as House : h)
+          if (payload.eventType === 'DELETE') return prev.filter(h => h.id !== payload.old.id)
+          return prev
+        })
+      })
+      .subscribe()
+
+    // Tempo Real (Realtime) para Ruas
+    const streetsChannel = supabase.channel('realtime-streets')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'streets' }, (payload) => {
+        setStreets(prev => {
+          if (payload.eventType === 'INSERT') {
+            const exists = prev.find(s => s.id === payload.new.id)
+            if (exists) return prev
+            return [...prev, payload.new as Street]
+          }
+          if (payload.eventType === 'UPDATE') return prev.map(s => s.id === payload.new.id ? payload.new as Street : s)
+          if (payload.eventType === 'DELETE') return prev.filter(s => s.id !== payload.old.id)
+          return prev
+        })
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(housesChannel)
+      supabase.removeChannel(streetsChannel)
+    }
   }, [supabase])
 
   // Init Mapbox
